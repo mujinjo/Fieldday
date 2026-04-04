@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> 필드데이 종합 관리</title>
+    <title>KUBA 필드데이 종합 관리</title>
     <style>
-        /* 모던 웹 폰트 및 기본 초기화 */
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; color: #333; }
-        h1 { font-size: 26px; color: #1a365d; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; }
+        h1 { font-size: 26px; color: #1a365d; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         
         .tabs { display: flex; margin-bottom: 25px; overflow-x: auto; white-space: nowrap; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
         .tabs::-webkit-scrollbar { display: none; }
@@ -21,86 +20,62 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
         h2 { font-size: 20px; color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0; }
-        .guide-text { color: #718096; font-size: 14px; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
-
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 15px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e0; }
         th, td { border: 1px solid #cbd5e0; padding: 12px; vertical-align: middle; }
-        th { background-color: #4a90e2; color: #fff; font-weight: 600; letter-spacing: 0.5px; }
+        th { background-color: #4a90e2; color: #fff; font-weight: 600; }
         .time-cell { background-color: #f1f5f9; font-weight: 700; color: #2c5282; border-right: 2px solid #cbd5e0; }
         
-        select, input[type="number"] { padding: 8px 12px; font-size: 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; transition: border 0.2s; font-family: inherit; }
-        select:focus, input[type="number"]:focus { border-color: #4a90e2; box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2); }
-        
+        select, input[type="number"] { padding: 8px 12px; font-size: 14px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; }
         .auto-text { font-weight: 600; color: #4a5568; background: #edf2f7; padding: 6px 12px; border-radius: 6px; display: inline-block; min-width: 60px; }
         .winner-select { background-color: #c6f6d5; color: #22543d; font-weight: 700; border-color: #9ae6b4; }
-        .winner-badge { background-color: #48bb78; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 0.85em; font-weight: bold; margin-left: 8px; display: inline-block; box-shadow: 0 2px 4px rgba(72,187,120,0.3); }
+        .winner-badge { background-color: #48bb78; color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 0.85em; font-weight: bold; margin-left: 8px; display: inline-block; }
 
         .bracket-container { display: flex; justify-content: space-between; margin-top: 30px; overflow-x: auto; padding-bottom: 20px; gap: 20px; }
         .round { display: flex; flex-direction: column; justify-content: space-around; width: 220px; min-width: 200px; }
         .round h3 { text-align: center; font-size: 15px; background: #2b6cb0; color: white; padding: 8px; border-radius: 6px; margin-bottom: 20px; margin-top: 0; }
-        .match { background: #fff; border: 1px solid #cbd5e0; border-radius: 8px; margin: 15px 0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden; }
-        .team { padding: 14px; border-bottom: 1px solid #edf2f7; font-weight: 600; color: #4a5568; }
-        .team:last-child { border-bottom: none; }
+        .match { background: #fff; border: 1px solid #cbd5e0; border-radius: 8px; margin: 15px 0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .team { padding: 14px; border-bottom: 1px solid #edf2f7; font-weight: 600; }
         .team.winner { background-color: #ebf8fa; color: #00875a; position: relative; }
-        .team.winner::after { content: '✓'; position: absolute; right: 15px; color: #00875a; }
+        .team.winner::after { content: '✓'; position: absolute; right: 15px; }
         .bye-match { background-color: #f8f9fa; border: 1px dashed #a0aec0; }
-        .bye-match .team { color: #718096; font-weight: 400; }
-        .champ-match { border: 2px solid #ecc94b; background: linear-gradient(180deg, #fffbeb 0%, #fff 100%); }
-        .champ-match .team { font-size: 20px; color: #b7791f; padding: 25px; font-weight: 800; }
+        .champ-match { border: 2px solid #ecc94b; background: #fffbeb; }
+        .champ-match .team { font-size: 20px; color: #b7791f; padding: 25px; font-weight: 800; border: none; }
 
         .relay-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
         .relay-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
-        .relay-card-header { background: #4a90e2; color: #fff; padding: 12px; text-align: center; font-weight: bold; font-size: 16px; }
+        .relay-card-header { background: #4a90e2; color: #fff; padding: 12px; text-align: center; font-weight: bold; }
         .relay-card-body { padding: 20px; }
-        .relay-team-list { list-style: none; padding: 0; margin: 0 0 15px 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .relay-team-tag { background: #edf2f7; color: #4a5568; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+        .relay-team-tag { background: #edf2f7; color: #4a5568; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 600; margin: 2px; display: inline-block; }
         .relay-result-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-top: 10px; }
         .relay-result-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 600; color: #166534; }
         
-        .relay-final-card { border: 2px solid #ecc94b; }
-        .relay-final-card .relay-card-header { background: #ecc94b; color: #744210; }
-        
         .editor-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .flex-center { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; align-items: flex-start; }
-
-        @keyframes unlockBoard {
-            0% { transform: scale(0.95); opacity: 0; }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); opacity: 1; }
-        }
         .score-board-active { animation: unlockBoard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes unlockBoard { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         
-        .reset-btn { background-color: #e53e3e; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: inherit; }
-        .reset-btn:hover { background-color: #c53030; }
+        .reset-btn { background-color: #e53e3e; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px; }
+        .admin-header h2 { border: none; padding: 0; margin: 0; }
     </style>
 </head>
 <body>
 
-    <h1>
-        🏆 쿠바 필드데이 종합 매니저
-        <button class="reset-btn" onclick="resetData()">데이터 초기화 (처음으로)</button>
-    </h1>
+    <h1>🏆 KUBA 필드데이 종합 관리</h1>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('scheduleView')">📅 타임테이블 (실시간)</div>
-        <div class="tab" onclick="switchTab('football')">⚽ 축구</div>
-        <div class="tab" onclick="switchTab('dodgeball')">🏐 피구</div>
-        <div class="tab" onclick="switchTab('tugofwar')">🧗 줄다리기</div>
-        <div class="tab" onclick="switchTab('jumprope')">🏃 줄넘기</div>
-        <div class="tab" onclick="switchTab('relay')">🏃‍♂️ 계주</div>
-        <div class="tab" style="margin-left:auto; background-color: #2b6cb0; color: white;" onclick="switchTab('scheduleEdit')">⚙️ 전체 승패 결과 입력</div>
+        <div class="tab active" id="tab-scheduleView" onclick="switchTab('scheduleView')">📅 타임테이블 (실시간)</div>
+        <div class="tab" id="tab-football" onclick="switchTab('football')">⚽ 축구</div>
+        <div class="tab" id="tab-dodgeball" onclick="switchTab('dodgeball')">🏐 피구</div>
+        <div class="tab" id="tab-tugofwar" onclick="switchTab('tugofwar')">🧗 줄다리기</div>
+        <div class="tab" id="tab-jumprope" onclick="switchTab('jumprope')">🏃 줄넘기</div>
+        <div class="tab" id="tab-relay" onclick="switchTab('relay')">🏃‍♂️ 계주</div>
+        <div class="tab" id="tab-scheduleEdit" style="margin-left:auto; background-color: #2b6cb0; color: white;" onclick="switchTab('scheduleEdit')">⚙️ 전체 승패 결과 입력 (🔒)</div>
     </div>
 
     <div id="scheduleView" class="content active">
         <h2>📅 실시간 행사 시간표</h2>
         <table style="margin-bottom: 30px;">
-            <thead>
-                <tr>
-                    <th style="width: 15%;">시간 / Time</th>
-                    <th style="width: 25%;">활동 / Activity</th>
-                    <th style="width: 60%;">대진 및 경기 결과</th>
-                </tr>
-            </thead>
+            <thead><tr><th>시간 / Time</th><th>활동 / Activity</th><th>대진 및 경기 결과</th></tr></thead>
             <tbody id="scheduleViewBody"></tbody>
         </table>
         <div id="totalScoreBoardWrapper"></div>
@@ -111,75 +86,68 @@
     <div id="tugofwar" class="content"><div class="bracket-container" id="bracket-tugofwar"></div></div>
     
     <div id="jumprope" class="content">
-        <div class="flex-center">
-            <div style="width: 350px;">
-                <h3 style="text-align: center; color: #2b6cb0;">🏆 줄넘기 실시간 랭킹</h3>
-                <div id="jumpropeRanking" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; background: #fff;"></div>
-            </div>
+        <div style="max-width: 400px; margin: 0 auto;">
+            <h3 style="text-align: center; color: #2b6cb0;">🏆 줄넘기 실시간 랭킹</h3>
+            <div id="jumpropeRanking" style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px;"></div>
         </div>
     </div>
 
     <div id="relay" class="content"><div class="relay-cards" id="relayCardsView"></div></div>
 
     <div id="scheduleEdit" class="content">
-        <h2>⚙️ 경기 결과 통합 입력 (자동 저장)</h2>
+        <div class="admin-header">
+            <h2>⚙️ 경기 결과 통합 입력 (관리자 전용)</h2>
+            <button class="reset-btn" onclick="resetData()">데이터 초기화</button>
+        </div>
         
         <div class="editor-box">
-            <h3 style="margin-top:0;">📌 단체줄넘기 기록 입력</h3>
-            <table style="width: 100%; max-width: 600px; margin: 0 auto; background: white;">
+            <h3>📌 단체줄넘기 기록 입력</h3>
+            <table style="max-width: 600px; margin: 0 auto; background: white;">
                 <thead><tr><th>조</th><th>성공 개수</th><th>조</th><th>성공 개수</th></tr></thead>
                 <tbody id="jumpropeInputs"></tbody>
             </table>
         </div>
 
         <div class="editor-box">
-            <h3 style="margin-top:0;">📌 계주(Relay) 결과 입력</h3>
+            <h3>📌 계주(Relay) 결과 입력</h3>
             <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                 <div style="flex: 1; background: white; padding: 15px; border-radius: 8px;">
-                    <h4 style="margin-top:0;">🔹 예선 A조 진출 (1,2,3조)</h4>
+                    <h4>🔹 예선 A조 진출 (2,5,6조)</h4>
                     1위: <select id="relay_a_w1" onchange="updateRelay()"></select> &nbsp;
                     2위: <select id="relay_a_w2" onchange="updateRelay()"></select>
                 </div>
                 <div style="flex: 1; background: white; padding: 15px; border-radius: 8px;">
-                    <h4 style="margin-top:0;">🔹 예선 B조 진출 (4,5,6,7조)</h4>
+                    <h4>🔹 예선 B조 진출 (1,3,4,7조)</h4>
                     1위: <select id="relay_b_w1" onchange="updateRelay()"></select> &nbsp;
                     2위: <select id="relay_b_w2" onchange="updateRelay()"></select>
                 </div>
                 <div style="flex: 1; background: #fffcf0; padding: 15px; border-radius: 8px; border: 1px solid #ecc94b;">
-                    <h4 style="margin-top:0;">🥇 결승전 (최종 순위)</h4>
+                    <h4>🥇 결승전 최종 순위</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div>1위 🥇 <br><select id="relay_f_r1" onchange="updateRelay()"></select></div>
-                        <div>2위 🥈 <br><select id="relay_f_r2" onchange="updateRelay()"></select></div>
-                        <div>3위 🥉 <br><select id="relay_f_r3" onchange="updateRelay()"></select></div>
-                        <div>4위 👏 <br><select id="relay_f_r4" onchange="updateRelay()"></select></div>
+                        <div>1위🥇<br><select id="relay_f_r1" onchange="updateRelay()"></select></div>
+                        <div>2위🥈<br><select id="relay_f_r2" onchange="updateRelay()"></select></div>
+                        <div>3위🥉<br><select id="relay_f_r3" onchange="updateRelay()"></select></div>
+                        <div>4위👏<br><select id="relay_f_r4" onchange="updateRelay()"></select></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="editor-box">
-            <h3 style="margin-top:0;">📌 구기 및 줄다리기 결과 입력</h3>
+            <h3>📌 구기 및 줄다리기 결과 입력</h3>
             <table>
-                <thead>
-                    <tr>
-                        <th style="width: 15%;">시간</th>
-                        <th style="width: 20%;">활동</th>
-                        <th style="width: 45%;">대진 현황</th>
-                        <th style="width: 20%;">승자 선택</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>시간</th><th>활동</th><th>대진 현황</th><th>승자 선택</th></tr></thead>
                 <tbody id="scheduleEditBody"></tbody>
             </table>
         </div>
     </div>
 
     <script>
+        const ADMIN_PASSWORD = "kuba46"; 
         const allGroups = ['1조', '2조', '3조', '4조', '5조', '6조', '7조'];
         const sports = ['football', 'dodgeball', 'tugofwar'];
-        
         const scoreRules = { football: [1000, 700, 300, 300], dodgeball: [1000, 700, 300, 300], tugofwar: [1000, 800, 200, 200], jumprope: [1000, 800, 200, 200], relay: [1400, 900, 600, 400] };
 
-        // [중요] 완벽하게 계산된 초기 고정 대진표 (부전승: 축구7, 피구6, 줄다리기5)
         const defaultState = {
             football: { bye: '7조', qf1: {t1:'1조', t2:'6조', w:''}, qf2: {t1:'4조', t2:'5조', w:''}, qf3: {t1:'2조', t2:'3조', w:''}, sf1: {t1:'7조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} },
             dodgeball: { bye: '6조', qf1: {t1:'2조', t2:'5조', w:''}, qf2: {t1:'3조', t2:'7조', w:''}, qf3: {t1:'1조', t2:'4조', w:''}, sf1: {t1:'6조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} },
@@ -187,30 +155,14 @@
         };
 
         const defaultJumpRopeData = { '1조': 0, '2조': 0, '3조': 0, '4조': 0, '5조': 0, '6조': 0, '7조': 0 };
+        const defaultRelayState = { a_w1: '', a_w2: '', b_w1: '', b_w2: '', f_r1: '', f_r2: '', f_r3: '', f_r4: '' };
 
-        // 계주 초기 고정 편성 (A조: 1,2,3 / B조: 4,5,6,7)
-        const defaultRelayState = {
-            a_w1: '', a_w2: '', b_w1: '', b_w2: '', f_r1: '', f_r2: '', f_r3: '', f_r4: ''
-        };
+        let state, jumpRopeData, relayState;
 
-        let state = {};
-        let jumpRopeData = {};
-        let relayState = {};
-
-        // LocalStorage 데이터 불러오기 및 저장 함수
         function loadData() {
-            const savedState = localStorage.getItem('cubaState');
-            const savedJR = localStorage.getItem('cubaJR');
-            const savedRelay = localStorage.getItem('cubaRelay');
-
-            if (savedState) state = JSON.parse(savedState);
-            else state = JSON.parse(JSON.stringify(defaultState));
-
-            if (savedJR) jumpRopeData = JSON.parse(savedJR);
-            else jumpRopeData = JSON.parse(JSON.stringify(defaultJumpRopeData));
-
-            if (savedRelay) relayState = JSON.parse(savedRelay);
-            else relayState = JSON.parse(JSON.stringify(defaultRelayState));
+            state = JSON.parse(localStorage.getItem('cubaState')) || JSON.parse(JSON.stringify(defaultState));
+            jumpRopeData = JSON.parse(localStorage.getItem('cubaJR')) || JSON.parse(JSON.stringify(defaultJumpRopeData));
+            relayState = JSON.parse(localStorage.getItem('cubaRelay')) || JSON.parse(JSON.stringify(defaultRelayState));
         }
 
         function saveData() {
@@ -220,85 +172,81 @@
         }
 
         function resetData() {
-            if (confirm("정말 모든 데이터를 초기화하시겠습니까? 입력한 승패가 모두 사라지고 기본 대진표로 돌아갑니다.")) {
-                localStorage.removeItem('cubaState');
-                localStorage.removeItem('cubaJR');
-                localStorage.removeItem('cubaRelay');
+            if (confirm("모든 데이터를 초기화하시겠습니까?")) {
+                localStorage.clear();
                 location.reload();
             }
         }
 
-        const bgColors = { '준비 집합': '#ffffff', '집합': '#ffffff', '0 타임': '#f5d0d6', '축구': '#e2f0d9', '피구': '#dae3f3', '줄다리기': '#fff2cc', '점심': '#f4b084', '단체줄넘기': '#ead1dc', '계주': '#f4cccc', 'Ending': '#f5d0d6' };
+        function switchTab(tabId) {
+            if (tabId === 'scheduleEdit') {
+                const pw = prompt("관리자 암호를 입력하세요:");
+                if (pw !== ADMIN_PASSWORD) {
+                    alert("암호가 틀렸습니다.");
+                    return;
+                }
+            }
+
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
 
         const scheduleLayout = [
-            { time: "9:20", act: "준비 집합", type: "static", text: "운영진 + 스태프", bg: bgColors['준비 집합'] },
-            { time: "10:00", act: "집합", type: "static", text: "All", bg: bgColors['집합'] },
-            { time: "10:00 ~ 10:20 (0 타임)", act: "무궁화꽃이 피었습니다 등 웜업", type: "static", text: "All", bg: bgColors['0 타임'] },
-            { time: "10:20 ~ 11:00 (1 타임)", act: "축구 (8강)", type: "match", sport: "football", round: "qf1", bg: bgColors['축구'] },
-            { time: "10:20 ~ 11:00 (1 타임)", act: "피구 (8강)", type: "match", sport: "dodgeball", round: "qf1", bg: bgColors['피구'] },
-            { time: "10:20 ~ 11:00 (1 타임)", act: "줄다리기 (8강)", type: "match", sport: "tugofwar", round: "qf1", bg: bgColors['줄다리기'] },
-            { time: "11:00 ~ 11:40 (2 타임)", act: "축구 (8강)", type: "match", sport: "football", round: "qf2", bg: bgColors['축구'] },
-            { time: "11:00 ~ 11:40 (2 타임)", act: "피구 (8강)", type: "match", sport: "dodgeball", round: "qf2", bg: bgColors['피구'] },
-            { time: "11:00 ~ 11:40 (2 타임)", act: "줄다리기 (8강)", type: "match", sport: "tugofwar", round: "qf2", bg: bgColors['줄다리기'] },
-            { time: "11:40 ~ 12:20 (3 타임)", act: "축구 (8강)", type: "match", sport: "football", round: "qf3", bg: bgColors['축구'] },
-            { time: "11:40 ~ 12:20 (3 타임)", act: "피구 (8강)", type: "match", sport: "dodgeball", round: "qf3", bg: bgColors['피구'] },
-            { time: "11:40 ~ 12:20 (3 타임)", act: "줄다리기 (8강)", type: "match", sport: "tugofwar", round: "qf3", bg: bgColors['줄다리기'] },
-            { time: "12:20 ~ 13:20", act: "점심 시간", type: "static", text: "All", bg: bgColors['점심'] },
-            { time: "13:20 ~ 14:00 (4 타임)", act: "단체줄넘기", type: "static", text: "단체줄넘기 탭 기록 반영", bg: bgColors['단체줄넘기'] },
-            { time: "14:00 ~ 14:40 (준결 1 타임)", act: "축구 (4강)", type: "match", sport: "football", round: "sf1", bg: bgColors['축구'] },
-            { time: "14:00 ~ 14:40 (준결 1 타임)", act: "피구 (4강)", type: "match", sport: "dodgeball", round: "sf1", bg: bgColors['피구'] },
-            { time: "14:00 ~ 14:40 (준결 1 타임)", act: "줄다리기 (4강)", type: "match", sport: "tugofwar", round: "sf1", bg: bgColors['줄다리기'] },
-            { time: "14:40 ~ 15:20 (준결 2 타임)", act: "축구 (4강)", type: "match", sport: "football", round: "sf2", bg: bgColors['축구'] },
-            { time: "14:40 ~ 15:20 (준결 2 타임)", act: "피구 (4강)", type: "match", sport: "dodgeball", round: "sf2", bg: bgColors['피구'] },
-            { time: "14:40 ~ 15:20 (준결 2 타임)", act: "줄다리기 (4강)", type: "match", sport: "tugofwar", round: "sf2", bg: bgColors['줄다리기'] },
-            { time: "15:20 ~ 16:00 (결승)", act: "축구 (결승)", type: "match", sport: "football", round: "f", bg: bgColors['축구'] },
-            { time: "15:20 ~ 16:00 (결승)", act: "피구 (결승)", type: "match", sport: "dodgeball", round: "f", bg: bgColors['피구'] },
-            { time: "15:20 ~ 16:00 (결승)", act: "줄다리기 (결승)", type: "match", sport: "tugofwar", round: "f", bg: bgColors['줄다리기'] },
-            { time: "16:00 ~ 16:30", act: "계주 (Relay)", type: "static", text: "계주 현황 탭 반영", bg: bgColors['계주'] },
-            { time: "16:30 ~ 17:00", act: "Ending Ceremony", type: "static", text: "All", bg: bgColors['Ending'] }
+            { time: "9:20", act: "준비 집합", type: "static", text: "운영진 + 스태프", bg: "#fff" },
+            { time: "10:00", act: "집합", type: "static", text: "All", bg: "#fff" },
+            { time: "10:00 ~ 10:20 (0 타임)", act: "웜업", type: "static", text: "All", bg: "#f5d0d6" },
+            { time: "10:20 ~ 11:00 (1 타임)", act: "축구 (8강)", type: "match", sport: "football", round: "qf1", bg: "#e2f0d9" },
+            { time: "10:20 ~ 11:00 (1 타임)", act: "피구 (8강)", type: "match", sport: "dodgeball", round: "qf1", bg: "#dae3f3" },
+            { time: "10:20 ~ 11:00 (1 타임)", act: "줄다리기 (8강)", type: "match", sport: "tugofwar", round: "qf1", bg: "#fff2cc" },
+            { time: "11:00 ~ 11:40 (2 타임)", act: "축구 (8강)", type: "match", sport: "football", round: "qf2", bg: "#e2f0d9" },
+            { time: "11:00 ~ 11:40 (2 타임)", act: "피구 (8강)", type: "match", sport: "dodgeball", round: "qf2", bg: "#dae3f3" },
+            { time: "11:00 ~ 11:40 (2 타임)", act: "줄다리기 (8강)", type: "match", sport: "tugofwar", round: "qf2", bg: "#fff2cc" },
+            { time: "11:40 ~ 12:20 (3 타임)", act: "축구 (8강)", type: "match", sport: "football", round: "qf3", bg: "#e2f0d9" },
+            { time: "11:40 ~ 12:20 (3 타임)", act: "피구 (8강)", type: "match", sport: "dodgeball", round: "qf3", bg: "#dae3f3" },
+            { time: "11:40 ~ 12:20 (3 타임)", act: "줄다리기 (8강)", type: "match", sport: "tugofwar", round: "qf3", bg: "#fff2cc" },
+            { time: "12:20 ~ 13:20", act: "점심 시간", type: "static", text: "All", bg: "#f4b084" },
+            { time: "13:20 ~ 14:00 (4 타임)", act: "단체줄넘기", type: "static", text: "줄넘기 탭 확인", bg: "#ead1dc" },
+            { time: "14:00 ~ 14:40 (준결 1 타임)", act: "축구 (4강)", type: "match", sport: "football", round: "sf1", bg: "#e2f0d9" },
+            { time: "14:00 ~ 14:40 (준결 1 타임)", act: "피구 (4강)", type: "match", sport: "dodgeball", round: "sf1", bg: "#dae3f3" },
+            { time: "14:00 ~ 14:40 (준결 1 타임)", act: "줄다리기 (4강)", type: "match", sport: "tugofwar", round: "sf1", bg: "#fff2cc" },
+            { time: "14:40 ~ 15:20 (준결 2 타임)", act: "축구 (4강)", type: "match", sport: "football", round: "sf2", bg: "#e2f0d9" },
+            { time: "14:40 ~ 15:20 (준결 2 타임)", act: "피구 (4강)", type: "match", sport: "dodgeball", round: "sf2", bg: "#dae3f3" },
+            { time: "14:40 ~ 15:20 (준결 2 타임)", act: "줄다리기 (4강)", type: "match", sport: "tugofwar", round: "sf2", bg: "#fff2cc" },
+            { time: "15:20 ~ 16:00 (결승)", act: "축구 (결승)", type: "match", sport: "football", round: "f", bg: "#e2f0d9" },
+            { time: "15:20 ~ 16:00 (결승)", act: "피구 (결승)", type: "match", sport: "dodgeball", round: "f", bg: "#dae3f3" },
+            { time: "15:20 ~ 16:00 (결승)", act: "줄다리기 (결승)", type: "match", sport: "tugofwar", round: "f", bg: "#fff2cc" },
+            { time: "16:00 ~ 16:30", act: "계주 (Relay)", type: "static", text: "계주 탭 확인", bg: "#f4cccc" },
+            { time: "16:30 ~ 17:00", act: "Ending", type: "static", text: "All", bg: "#f5d0d6" }
         ];
 
         function renderTable(tbodyId, isEditMode) {
             const tbody = document.getElementById(tbodyId);
             tbody.innerHTML = '';
             let timeCounts = {};
-            scheduleLayout.forEach(row => { timeCounts[row.time] = (timeCounts[row.time] || 0) + 1; });
+            scheduleLayout.forEach(row => timeCounts[row.time] = (timeCounts[row.time] || 0) + 1);
             let renderedTimes = {};
 
             scheduleLayout.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.style.backgroundColor = row.bg;
                 let html = '';
-
                 if (!renderedTimes[row.time]) {
                     html += `<td rowspan="${timeCounts[row.time]}" class="time-cell">${row.time}</td>`;
                     renderedTimes[row.time] = true;
                 }
-
                 if (row.type === 'static') {
-                    if (isEditMode) html += `<td colspan="2">${row.act}</td><td><b>${row.text}</b></td>`;
-                    else html += `<td><b>${row.act}</b></td><td><span class="auto-text">${row.text}</span></td>`;
+                    html += isEditMode ? `<td colspan="2">${row.act}</td><td><b>${row.text}</b></td>` : `<td><b>${row.act}</b></td><td><span class="auto-text">${row.text}</span></td>`;
                 } else {
                     const sData = state[row.sport][row.round];
                     if (isEditMode) {
-                        // 예선전 조 편성은 하드코딩된 값으로 고정 (선택 불가 텍스트로 표시)
-                        let matchCol = `<td><span class="auto-text">${sData.t1 || 'TBD'}</span> <b>vs</b> <span class="auto-text">${sData.t2 || 'TBD'}</span></td>`;
-                        
                         const canWin = sData.t1 && sData.t2 && sData.t1 !== 'TBD' && sData.t2 !== 'TBD';
-                        let winnerCol = `<td>
-                            <select class="winner-select" ${!canWin ? 'disabled' : ''} onchange="updateMatch('${row.sport}', '${row.round}', 'w', this.value)">
-                                <option value="">승리조</option>
-                                ${canWin ? `<option value="${sData.t1}" ${sData.w === sData.t1 ? 'selected' : ''}>${sData.t1}</option>
-                                            <option value="${sData.t2}" ${sData.w === sData.t2 ? 'selected' : ''}>${sData.t2}</option>` : ''}
-                            </select>
-                        </td>`;
-                        html += `<td><b>${row.act}</b></td>${matchCol}${winnerCol}`;
+                        html += `<td><b>${row.act}</b></td><td><span class="auto-text">${sData.t1}</span> vs <span class="auto-text">${sData.t2}</span></td>
+                                 <td><select class="winner-select" ${!canWin ? 'disabled' : ''} onchange="updateMatch('${row.sport}', '${row.round}', 'w', this.value)">
+                                 <option value="">승리조</option>${canWin ? `<option value="${sData.t1}" ${sData.w === sData.t1 ? 'selected' : ''}>${sData.t1}</option><option value="${sData.t2}" ${sData.w === sData.t2 ? 'selected' : ''}>${sData.t2}</option>` : ''}</select></td>`;
                     } else {
-                        const t1 = sData.t1 || 'TBD';
-                        const t2 = sData.t2 || 'TBD';
-                        let matchText = `<b>${t1}</b> vs <b>${t2}</b>`;
-                        if (sData.w) matchText += ` <span class="winner-badge">승리: ${sData.w}</span>`;
-                        html += `<td><b>${row.act}</b></td><td>${matchText}</td>`;
+                        html += `<td><b>${row.act}</b></td><td><b>${sData.t1 || 'TBD'}</b> vs <b>${sData.t2 || 'TBD'}</b>${sData.w ? ` <span class="winner-badge">승리: ${sData.w}</span>` : ''}</td>`;
                     }
                 }
                 tr.innerHTML = html;
@@ -309,249 +257,85 @@
         function updateMatch(sport, round, field, value) {
             state[sport][round][field] = value;
             const s = state[sport];
-            
-            // 승패 연동 업데이트
             s.sf1.t2 = s.qf1.w || 'TBD';
             s.sf2.t1 = s.qf2.w || 'TBD';
             s.sf2.t2 = s.qf3.w || 'TBD';
             s.f.t1 = s.sf1.w || 'TBD';
             s.f.t2 = s.sf2.w || 'TBD';
-
-            saveData(); // 데이터 저장
+            saveData();
             refreshAll();
         }
 
         function renderBrackets() {
             sports.forEach(sport => {
-                const s = state[sport];
-                const getW = (t, m) => (t && t !== 'TBD' && m.w === t) ? 'winner' : '';
-                document.getElementById(`bracket-${sport}`).innerHTML = `
-                    <div class="round">
-                        <h3>8강 (예선)</h3>
-                        <div class="match bye-match"><div class="team">부전승</div><div class="team">${s.bye}</div></div>
-                        <div class="match"><div class="team ${getW(s.qf1.t1, s.qf1)}">${s.qf1.t1 || 'TBD'}</div><div class="team ${getW(s.qf1.t2, s.qf1)}">${s.qf1.t2 || 'TBD'}</div></div>
-                        <div class="match"><div class="team ${getW(s.qf2.t1, s.qf2)}">${s.qf2.t1 || 'TBD'}</div><div class="team ${getW(s.qf2.t2, s.qf2)}">${s.qf2.t2 || 'TBD'}</div></div>
-                        <div class="match"><div class="team ${getW(s.qf3.t1, s.qf3)}">${s.qf3.t1 || 'TBD'}</div><div class="team ${getW(s.qf3.t2, s.qf3)}">${s.qf3.t2 || 'TBD'}</div></div>
-                    </div>
-                    <div class="round">
-                        <h3>4강 (준결승)</h3>
-                        <div class="match"><div class="team ${getW(s.sf1.t1, s.sf1)}">${s.sf1.t1}</div><div class="team ${getW(s.sf1.t2, s.sf1)}">${s.sf1.t2}</div></div>
-                        <div class="match" style="margin-top: 80px;"><div class="team ${getW(s.sf2.t1, s.sf2)}">${s.sf2.t1}</div><div class="team ${getW(s.sf2.t2, s.sf2)}">${s.sf2.t2}</div></div>
-                    </div>
-                    <div class="round">
-                        <h3>결승</h3>
-                        <div class="match" style="margin-top: 30px;"><div class="team ${getW(s.f.t1, s.f)}">${s.f.t1}</div><div class="team ${getW(s.f.t2, s.f)}">${s.f.t2}</div></div>
-                    </div>
-                    <div class="round">
-                        <h3>종목 우승 🏆</h3>
-                        <div class="match champ-match"><div class="team">${s.f.w || 'TBD'}</div></div>
-                    </div>
-                `;
+                const s = state[sport], getW = (t, m) => (t && t !== 'TBD' && m.w === t) ? 'winner' : '';
+                document.getElementById(`bracket-${sport}`).innerHTML = `<div class="round"><h3>예선</h3><div class="match bye-match"><div class="team">부전승</div><div class="team">${s.bye}</div></div><div class="match"><div class="team ${getW(s.qf1.t1, s.qf1)}">${s.qf1.t1}</div><div class="team ${getW(s.qf1.t2, s.qf1)}">${s.qf1.t2}</div></div><div class="match"><div class="team ${getW(s.qf2.t1, s.qf2)}">${s.qf2.t1}</div><div class="team ${getW(s.qf2.t2, s.qf2)}">${s.qf2.t2}</div></div><div class="match"><div class="team ${getW(s.qf3.t1, s.qf3)}">${s.qf3.t1}</div><div class="team ${getW(s.qf3.t2, s.qf3)}">${s.qf3.t2}</div></div></div><div class="round"><h3>4강</h3><div class="match"><div class="team ${getW(s.sf1.t1, s.sf1)}">${s.sf1.t1}</div><div class="team ${getW(s.sf1.t2, s.sf1)}">${s.sf1.t2}</div></div><div class="match" style="margin-top:80px;"><div class="team ${getW(s.sf2.t1, s.sf2)}">${s.sf2.t1}</div><div class="team ${getW(s.sf2.t2, s.sf2)}">${s.sf2.t2}</div></div></div><div class="round"><h3>결승</h3><div class="match" style="margin-top:30px;"><div class="team ${getW(s.f.t1, s.f)}">${s.f.t1}</div><div class="team ${getW(s.f.t2, s.f)}">${s.f.t2}</div></div></div><div class="round"><h3>우승🏆</h3><div class="match champ-match"><div class="team">${s.f.w || 'TBD'}</div></div></div>`;
             });
         }
 
-        // 줄넘기 로직
         function renderJumpRope() {
             const tbody = document.getElementById('jumpropeInputs');
             tbody.innerHTML = '';
             for(let i=0; i<4; i++) {
-                const tr = document.createElement('tr');
-                const g1 = allGroups[i], g2 = allGroups[i+4];
+                const tr = document.createElement('tr'), g1 = allGroups[i], g2 = allGroups[i+4];
                 let h = `<td><b>${g1}</b></td><td><input type="number" min="0" value="${jumpRopeData[g1]}" oninput="updateJR('${g1}', this.value)"></td>`;
                 if(g2) h += `<td><b>${g2}</b></td><td><input type="number" min="0" value="${jumpRopeData[g2]}" oninput="updateJR('${g2}', this.value)"></td>`;
-                else h += `<td></td><td></td>`;
-                tr.innerHTML = h;
-                tbody.appendChild(tr);
+                tr.innerHTML = h; tbody.appendChild(tr);
             }
             updateJRR();
         }
-        function updateJR(g, v) { 
-            jumpRopeData[g] = parseInt(v) || 0; 
-            saveData();
-            updateJRR(); 
-        }
+        function updateJR(g, v) { jumpRopeData[g] = parseInt(v) || 0; saveData(); updateJRR(); }
         function updateJRR() {
             const sorted = Object.entries(jumpRopeData).sort((a,b) => b[1]-a[1]);
-            let h = '';
-            sorted.forEach((it, idx) => {
-                const medal = idx==0?'🥇':idx==1?'🥈':idx==2?'🥉':`${idx+1}위`;
-                const bg = idx==0?'#fffacd':idx==1?'#f1f5f9':idx==2?'#fdf5e6':'#fff';
-                const fw = idx<3?'bold':'normal';
-                h += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #edf2f7; background:${bg}; font-weight:${fw};">
-                        <span>${medal} &nbsp;${it[0]}</span><span style="color:#2b6cb0;">${it[1]}개</span>
-                      </div>`;
+            let h = ''; sorted.forEach((it, idx) => {
+                const medal = idx==0?'🥇':idx==1?'🥈':idx==2?'🥉':`${idx+1}위`, bg = idx==0?'#fffacd':idx==1?'#f1f5f9':idx==2?'#fdf5e6':'#fff';
+                h += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #edf2f7; background:${bg}; font-weight:${idx<3?'bold':'normal'};"><span>${medal} ${it[0]}</span><span style="color:#2b6cb0;">${it[1]}개</span></div>`;
             });
             document.getElementById('jumpropeRanking').innerHTML = h;
             checkAllAndRenderScoreBoard();
         }
 
-        // 계주 로직
         function initRelay() {
             updateRelayDOM();
             renderRelayView();
         }
-
         function updateRelay() {
-            // 값 읽어서 상태 업데이트
-            ['a_w1','a_w2','b_w1','b_w2','f_r1','f_r2','f_r3','f_r4'].forEach(id => {
-                relayState[id] = document.getElementById('relay_'+id).value;
-            });
-            saveData();
-            updateRelayDOM();
-            renderRelayView();
-            checkAllAndRenderScoreBoard();
+            ['a_w1','a_w2','b_w1','b_w2','f_r1','f_r2','f_r3','f_r4'].forEach(id => relayState[id] = document.getElementById('relay_'+id).value);
+            saveData(); updateRelayDOM(); renderRelayView(); checkAllAndRenderScoreBoard();
         }
-
         function updateRelayDOM() {
             const setOpts = (ids, teams) => {
                 const h = `<option value="">선택</option>` + teams.map(t=>`<option value="${t}">${t}</option>`).join('');
-                ids.forEach(id => { 
-                    const e = document.getElementById('relay_'+id); 
-                    e.innerHTML = h; 
-                    if(teams.includes(relayState[id])) e.value = relayState[id]; 
-                });
+                ids.forEach(id => { const e = document.getElementById('relay_'+id); e.innerHTML = h; if(teams.includes(relayState[id])) e.value = relayState[id]; });
             };
-
-            setOpts(['a_w1','a_w2'], ['1조','2조','3조']);
-            setOpts(['b_w1','b_w2'], ['4조','5조','6조','7조']);
-            
-            const fT = [relayState.a_w1, relayState.a_w2, relayState.b_w1, relayState.b_w2].filter(v=>v);
-            setOpts(['f_r1','f_r2','f_r3','f_r4'], fT);
+            setOpts(['a_w1','a_w2'], ['2조','5조','6조']); 
+            setOpts(['b_w1','b_w2'], ['1조','3조','4조','7조']); 
+            setOpts(['f_r1','f_r2','f_r3','f_r4'], [relayState.a_w1, relayState.a_w2, relayState.b_w1, relayState.b_w2].filter(v=>v));
         }
-
         function renderRelayView() {
-            const a1=relayState.a_w1, a2=relayState.a_w2, b1=relayState.b_w1, b2=relayState.b_w2;
-            const getTag = (t, r1, r2) => t ? `<span class="relay-team-tag" style="${t===r1||t===r2?'background:#c6f6d5; color:#22543d; border:1px solid #48bb78;':''}">${t}</span>` : '';
-            const getRes = (r1, r2) => (r1||r2) ? `<div class="relay-result-box"><div class="relay-result-row"><span>진출 (1위)</span><span>${r1||'-'}</span></div><div class="relay-result-row"><span>진출 (2위)</span><span>${r2||'-'}</span></div></div>` : '';
-
-            const fT = [a1, a2, b1, b2].filter(v=>v);
-
-            let vHTML = `
-                <div class="relay-card">
-                    <div class="relay-card-header">🔹 예선 A조</div>
-                    <div class="relay-card-body">
-                        <div class="relay-team-list">${['1조','2조','3조'].map(t=>getTag(t,a1,a2)).join('')}</div>
-                        ${getRes(a1,a2)}
-                    </div>
-                </div>
-                <div class="relay-card">
-                    <div class="relay-card-header">🔹 예선 B조</div>
-                    <div class="relay-card-body">
-                        <div class="relay-team-list">${['4조','5조','6조','7조'].map(t=>getTag(t,b1,b2)).join('')}</div>
-                        ${getRes(b1,b2)}
-                    </div>
-                </div>
-                <div class="relay-card relay-final-card">
-                    <div class="relay-card-header">🏆 계주 결승전</div>
-                    <div class="relay-card-body">
-                        <div class="relay-team-list">${fT.map(t=>`<span class="relay-team-tag">${t}</span>`).join('')}</div>
-                        <div style="background:#fffbeb; border:1px solid #f6e05e; padding:15px; border-radius:8px; margin-top:10px;">
-                            <div style="margin-bottom:8px;">🥇 1위: <b>${relayState.f_r1||'-'}</b></div>
-                            <div style="margin-bottom:8px;">🥈 2위: <b>${relayState.f_r2||'-'}</b></div>
-                            <div style="margin-bottom:8px;">🥉 3위: <b>${relayState.f_r3||'-'}</b></div>
-                            <div>👏 4위: <b>${relayState.f_r4||'-'}</b></div>
-                        </div>
-                    </div>
-                </div>`;
-            document.getElementById('relayCardsView').innerHTML = vHTML;
-        }
-
-        /* ----- 최종 종합 점수 로직 ----- */
-        function isAllEventsFinished() {
-            if (!state.football.f.w || !state.dodgeball.f.w || !state.tugofwar.f.w) return false;
-            if (!relayState.f_r1 || !relayState.f_r2 || !relayState.f_r3 || !relayState.f_r4) return false;
-            return true;
-        }
-
-        function calculateTotalScores() {
-            let scores = { '1조':0, '2조':0, '3조':0, '4조':0, '5조':0, '6조':0, '7조':0 };
-
-            sports.forEach(sport => {
-                const s = state[sport];
-                if(s.f.w) {
-                    scores[s.f.w] += scoreRules[sport][0]; 
-                    const sec = (s.f.w === s.f.t1) ? s.f.t2 : s.f.t1;
-                    if(sec && sec !== 'TBD') scores[sec] += scoreRules[sport][1]; 
-
-                    const sf1_loser = (s.sf1.w === s.sf1.t1) ? s.sf1.t2 : s.sf1.t1;
-                    const sf2_loser = (s.sf2.w === s.sf2.t1) ? s.sf2.t2 : s.sf2.t1;
-                    if(sf1_loser && sf1_loser !== 'TBD') scores[sf1_loser] += scoreRules[sport][2];
-                    if(sf2_loser && sf2_loser !== 'TBD') scores[sf2_loser] += scoreRules[sport][3];
-                }
-            });
-
-            const sortedJR = Object.entries(jumpRopeData).sort((a,b) => b[1]-a[1]);
-            for(let i=0; i<4; i++) {
-                if(sortedJR[i] && sortedJR[i][1] > 0) scores[sortedJR[i][0]] += scoreRules.jumprope[i];
-            }
-
-            if(relayState.f_r1) scores[relayState.f_r1] += scoreRules.relay[0];
-            if(relayState.f_r2) scores[relayState.f_r2] += scoreRules.relay[1];
-            if(relayState.f_r3) scores[relayState.f_r3] += scoreRules.relay[2];
-            if(relayState.f_r4) scores[relayState.f_r4] += scoreRules.relay[3];
-
-            return scores;
+            const getTag = (t, r1, r2) => t ? `<span class="relay-team-tag" style="${t===r1||t===r2?'background:#c6f6d5;':''}">${t}</span>` : '';
+            const fT = [relayState.a_w1, relayState.a_w2, relayState.b_w1, relayState.b_w2].filter(v=>v);
+            document.getElementById('relayCardsView').innerHTML = `<div class="relay-card"><div class="relay-card-header">🔹 예선 A조 (2,5,6)</div><div class="relay-card-body"><div class="relay-team-list">${['2조','5조','6조'].map(t=>getTag(t,relayState.a_w1,relayState.a_w2)).join('')}</div></div></div><div class="relay-card"><div class="relay-card-header">🔹 예선 B조 (1,3,4,7)</div><div class="relay-card-body"><div class="relay-team-list">${['1조','3조','4조','7조'].map(t=>getTag(t,relayState.b_w1,relayState.b_w2)).join('')}</div></div></div><div class="relay-card relay-final-card"><div class="relay-card-header">🏆 계주 결승전</div><div class="relay-card-body"><div style="background:#fffbeb; padding:15px; border-radius:8px;">🥇1위: ${relayState.f_r1||'-'}<br>🥈2위: ${relayState.f_r2||'-'}<br>🥉3위: ${relayState.f_r3||'-'}<br>👏4위: ${relayState.f_r4||'-'}</div></div></div>`;
         }
 
         function checkAllAndRenderScoreBoard() {
             const wrapper = document.getElementById('totalScoreBoardWrapper');
-            if (!isAllEventsFinished()) {
-                wrapper.innerHTML = `
-                    <div style="background: #edf2f7; padding: 30px; border-radius: 12px; text-align: center; color: #4a5568; border: 2px dashed #a0aec0;">
-                        <div style="font-size: 30px; margin-bottom: 10px;">🔒</div>
-                        <h3 style="margin-top:0; color: #2d3748;">최종 점수 블라인드 처리 중</h3>
-                        <p style="margin-bottom:0;">행사의 긴장감을 위해 최종 순위는 모든 경기가 끝난 후 공개됩니다.<br>구기 종목 결승과 계주 결과가 모두 입력되면 자물쇠가 풀립니다.</p>
-                    </div>`;
+            if (!state.football.f.w || !state.dodgeball.f.w || !state.tugofwar.f.w || !relayState.f_r1) {
+                wrapper.innerHTML = `<div style="background:#edf2f7; padding:30px; border-radius:12px; text-align:center; border:2px dashed #a0aec0;">🔒 모든 경기가 완료되면 최종 점수가 공개됩니다.</div>`;
                 return;
             }
-
-            const scores = calculateTotalScores();
-            const sortedScores = Object.entries(scores).sort((a,b) => b[1]-a[1]);
-
-            let html = `
-                <div class="score-board-active" style="background: #fff; border: 3px solid #ecc94b; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(214, 158, 46, 0.2);">
-                    <div style="background: linear-gradient(135deg, #d69e2e, #ecc94b); color: white; padding: 20px; text-align: center;">
-                        <h2 style="margin: 0; color: white; font-size: 24px;">🎉 쿠바 체육대회 최종 종합 우승 🎉</h2>
-                    </div>
-                    <div style="padding: 20px; background: #fffbeb;">
-                        <table style="width: 100%; border: none; margin: 0; background: transparent;"><tbody>`;
-
-            sortedScores.forEach((item, idx) => {
-                let medalStr = (idx + 1) + '위';
-                let bg = 'transparent', fw = 'normal', color = '#4a5568', scale = '16px';
-                if (idx === 0) { medalStr = '🏆 종합 우승'; bg = '#fefcbf'; fw = '800'; color = '#b7791f'; scale = '20px'; }
-                else if (idx === 1) { medalStr = '🥈 준우승'; fw = '700'; color = '#475569'; scale = '18px'; }
-                else if (idx === 2) { medalStr = '🥉 종합 3위'; fw = '700'; color = '#9c4221'; scale = '18px'; }
-
-                html += `<tr style="background: ${bg}; font-weight: ${fw}; color: ${color}; border-bottom: 1px solid #f6e05e;">
-                            <td style="padding: 15px; border: none; font-size: ${scale}; width: 30%; text-align: left; padding-left: 20px;">${medalStr}</td>
-                            <td style="padding: 15px; border: none; font-size: ${scale}; width: 30%;">${item[0]}</td>
-                            <td style="padding: 15px; border: none; font-size: ${scale}; width: 40%; text-align: right; padding-right: 20px;">${item[1].toLocaleString()} 점</td>
-                         </tr>`;
-            });
-            html += `</tbody></table></div></div>`;
-            wrapper.innerHTML = html;
+            let sc = { '1조':0, '2조':0, '3조':0, '4조':0, '5조':0, '6조':0, '7조':0 };
+            sports.forEach(sp => { const s = state[sp]; if(s.f.w){ sc[s.f.w]+=scoreRules[sp][0]; sc[s.f.w===s.f.t1?s.f.t2:s.f.t1]+=scoreRules[sp][1]; sc[s.sf1.w===s.sf1.t1?s.sf1.t2:s.sf1.t1]+=scoreRules[sp][2]; sc[s.sf2.w===s.sf2.t1?s.sf2.t2:s.sf2.t1]+=scoreRules[sp][3]; } });
+            Object.entries(jumpRopeData).sort((a,b)=>b[1]-a[1]).slice(0,4).forEach((it,i)=>sc[it[0]]+=scoreRules.jumprope[i]);
+            [relayState.f_r1, relayState.f_r2, relayState.f_r3, relayState.f_r4].forEach((r,i)=>{if(r) sc[r]+=scoreRules.relay[i]});
+            const sorted = Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+            let h = `<div class="score-board-active" style="border:3px solid #ecc94b; border-radius:12px; overflow:hidden;"><div style="background:#ecc94b; padding:20px; text-align:center; font-weight:800;">🎉 최종 종합 우승 🎉</div><div style="padding:20px; background:#fffbeb;"><table>`;
+            sorted.forEach((it,i) => { h+=`<tr><td>${i==0?'🏆우승':(i+1)+'위'}</td><td>${it[0]}</td><td>${it[1].toLocaleString()}점</td></tr>` });
+            wrapper.innerHTML = h + `</table></div></div>`;
         }
 
-        function refreshAll() {
-            renderTable('scheduleEditBody', true);
-            renderTable('scheduleViewBody', false);
-            renderBrackets();
-            checkAllAndRenderScoreBoard();
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        }
-
-        // 초기화 및 데이터 로드
-        loadData();
-        renderJumpRope();
-        initRelay();
-        refreshAll();
+        function refreshAll() { renderTable('scheduleEditBody', true); renderTable('scheduleViewBody', false); renderBrackets(); checkAllAndRenderScoreBoard(); }
+        loadData(); initRelay(); renderJumpRope(); refreshAll();
     </script>
 </body>
 </html>
