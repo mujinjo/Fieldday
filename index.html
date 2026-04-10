@@ -73,17 +73,12 @@
     </div>
 
     <div id="scheduleView" class="content active">
-      <h2>📅 실시간 행사 시간표</h2>
-      <table style="margin-bottom: 30px;">
-        <colgroup>
-            <col style="width: 30%;">
-            <col style="width: 30%;">
-            <col style="width: 40%;">
-        </colgroup>
-        <thead><tr><th>시간 / Time</th><th>활동 / Activity</th><th>대진 및 경기 결과</th></tr></thead>
-        <tbody id="scheduleViewBody"></tbody>
-      </table>
-      <div id="totalScoreBoardWrapper"></div>
+        <h2>📅 실시간 행사 시간표</h2>
+        <table style="margin-bottom: 30px;">
+            <thead><tr><th>시간 / Time</th><th>활동 / Activity</th><th>대진 및 경기 결과</th></tr></thead>
+            <tbody id="scheduleViewBody"></tbody>
+        </table>
+        <div id="totalScoreBoardWrapper"></div>
     </div>
 
     <div id="football" class="content"><div class="bracket-container" id="bracket-football"></div></div>
@@ -153,10 +148,11 @@
         const sports = ['football', 'dodgeball', 'tugofwar'];
         const scoreRules = { football: [1000, 700, 300, 300], dodgeball: [1000, 700, 300, 300], tugofwar: [1000, 800, 200, 200], jumprope: [1000, 800, 200, 200], relay: [1400, 900, 600, 400] };
 
+        // 새로운 대진표 데이터 반영 (이미지 기준)
         const defaultState = {
-            football: { bye: '7조', qf1: {t1:'1조', t2:'6조', w:''}, qf2: {t1:'4조', t2:'5조', w:''}, qf3: {t1:'2조', t2:'3조', w:''}, sf1: {t1:'7조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} },
-            dodgeball: { bye: '4조', qf1: {t1:'2조', t2:'5조', w:''}, qf2: {t1:'3조', t2:'6조', w:''}, qf3: {t1:'1조', t2:'7조', w:''}, sf1: {t1:'4조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} },
-            tugofwar: { bye: '1조', qf1: {t1:'3조', t2:'4조', w:''}, qf2: {t1:'2조', t2:'7조', w:''}, qf3: {t1:'5조', t2:'6조', w:''}, sf1: {t1:'1조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} }
+            football: { bye: '4조', qf1: {t1:'1조', t2:'3조', w:''}, qf2: {t1:'2조', t2:'7조', w:''}, qf3: {t1:'5조', t2:'6조', w:''}, sf1: {t1:'4조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} },
+            dodgeball: { bye: '7조', qf1: {t1:'2조', t2:'5조', w:''}, qf2: {t1:'1조', t2:'6조', w:''}, qf3: {t1:'3조', t2:'4조', w:''}, sf1: {t1:'7조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} },
+            tugofwar: { bye: '1조', qf1: {t1:'4조', t2:'6조', w:''}, qf2: {t1:'3조', t2:'5조', w:''}, qf3: {t1:'2조', t2:'7조', w:''}, sf1: {t1:'1조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} }
         };
 
         const defaultJumpRopeData = { '1조': 0, '2조': 0, '3조': 0, '4조': 0, '5조': 0, '6조': 0, '7조': 0 };
@@ -177,7 +173,7 @@
         }
 
         function resetData() {
-            if (confirm("모든 데이터를 초기화하시겠습니까?")) {
+            if (confirm("모든 데이터를 초기화하시겠습니까? 대진표가 새로 입력하신 최신 버전으로 리셋됩니다.")) {
                 localStorage.clear();
                 location.reload();
             }
@@ -259,14 +255,28 @@
             });
         }
 
+        // 종목별로 다른 예선->준결승 연동 로직
         function updateMatch(sport, round, field, value) {
             state[sport][round][field] = value;
             const s = state[sport];
-            s.sf1.t2 = s.qf1.w || 'TBD';
-            s.sf2.t1 = s.qf2.w || 'TBD';
-            s.sf2.t2 = s.qf3.w || 'TBD';
+            
+            if (sport === 'football') {
+                s.sf1.t2 = s.qf3.w || 'TBD';
+                s.sf2.t1 = s.qf1.w || 'TBD';
+                s.sf2.t2 = s.qf2.w || 'TBD';
+            } else if (sport === 'dodgeball') {
+                s.sf1.t2 = s.qf1.w || 'TBD';
+                s.sf2.t1 = s.qf2.w || 'TBD';
+                s.sf2.t2 = s.qf3.w || 'TBD';
+            } else if (sport === 'tugofwar') {
+                s.sf1.t2 = s.qf1.w || 'TBD';
+                s.sf2.t1 = s.qf2.w || 'TBD';
+                s.sf2.t2 = s.qf3.w || 'TBD';
+            }
+            
             s.f.t1 = s.sf1.w || 'TBD';
             s.f.t2 = s.sf2.w || 'TBD';
+            
             saveData();
             refreshAll();
         }
