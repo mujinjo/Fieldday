@@ -148,7 +148,7 @@
         const sports = ['football', 'dodgeball', 'tugofwar'];
         const scoreRules = { football: [1000, 700, 300, 300], dodgeball: [1000, 700, 300, 300], tugofwar: [1000, 800, 200, 200], jumprope: [1000, 800, 200, 200], relay: [1400, 900, 600, 400] };
 
-        // 새로운 대진표 데이터 반영 (이미지 기준)
+        // 새로운 대진표 데이터 반영
         const defaultState = {
             football: { bye: '4조', qf1: {t1:'1조', t2:'3조', w:''}, qf2: {t1:'2조', t2:'7조', w:''}, qf3: {t1:'5조', t2:'6조', w:''}, sf1: {t1:'4조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} },
             dodgeball: { bye: '7조', qf1: {t1:'2조', t2:'5조', w:''}, qf2: {t1:'1조', t2:'6조', w:''}, qf3: {t1:'3조', t2:'4조', w:''}, sf1: {t1:'7조', t2:'TBD', w:''}, sf2: {t1:'TBD', t2:'TBD', w:''}, f: {t1:'TBD', t2:'TBD', w:''} },
@@ -162,8 +162,36 @@
 
         function loadData() {
             state = JSON.parse(localStorage.getItem('cubaState')) || JSON.parse(JSON.stringify(defaultState));
+            
+            // 캐시 충돌 방지: 무조건 최신 대진표 팀명으로 덮어쓰기 (승패 w 결과만 남김)
+            sports.forEach(sport => {
+                state[sport].bye = defaultState[sport].bye;
+                state[sport].qf1.t1 = defaultState[sport].qf1.t1;
+                state[sport].qf1.t2 = defaultState[sport].qf1.t2;
+                state[sport].qf2.t1 = defaultState[sport].qf2.t1;
+                state[sport].qf2.t2 = defaultState[sport].qf2.t2;
+                state[sport].qf3.t1 = defaultState[sport].qf3.t1;
+                state[sport].qf3.t2 = defaultState[sport].qf3.t2;
+                state[sport].sf1.t1 = defaultState[sport].bye;
+            });
+
             jumpRopeData = JSON.parse(localStorage.getItem('cubaJR')) || JSON.parse(JSON.stringify(defaultJumpRopeData));
             relayState = JSON.parse(localStorage.getItem('cubaRelay')) || JSON.parse(JSON.stringify(defaultRelayState));
+            
+            // 로드 시점에 승자 경로 강제 재연동
+            sports.forEach(sport => {
+                if (sport === 'football') {
+                    state[sport].sf1.t2 = state[sport].qf3.w || 'TBD';
+                    state[sport].sf2.t1 = state[sport].qf1.w || 'TBD';
+                    state[sport].sf2.t2 = state[sport].qf2.w || 'TBD';
+                } else {
+                    state[sport].sf1.t2 = state[sport].qf1.w || 'TBD';
+                    state[sport].sf2.t1 = state[sport].qf2.w || 'TBD';
+                    state[sport].sf2.t2 = state[sport].qf3.w || 'TBD';
+                }
+                state[sport].f.t1 = state[sport].sf1.w || 'TBD';
+                state[sport].f.t2 = state[sport].sf2.w || 'TBD';
+            });
         }
 
         function saveData() {
@@ -187,7 +215,6 @@
                     return;
                 }
             }
-
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
@@ -260,15 +287,14 @@
             state[sport][round][field] = value;
             const s = state[sport];
             
+            // 축구: 4조 부전승이 3타임(5v6) 승자와 SF1 만남 / 1타임, 2타임 승자가 SF2 만남
             if (sport === 'football') {
                 s.sf1.t2 = s.qf3.w || 'TBD';
                 s.sf2.t1 = s.qf1.w || 'TBD';
                 s.sf2.t2 = s.qf2.w || 'TBD';
-            } else if (sport === 'dodgeball') {
-                s.sf1.t2 = s.qf1.w || 'TBD';
-                s.sf2.t1 = s.qf2.w || 'TBD';
-                s.sf2.t2 = s.qf3.w || 'TBD';
-            } else if (sport === 'tugofwar') {
+            } 
+            // 피구 & 줄다리기: 부전승이 1타임 승자와 SF1 만남 / 2타임, 3타임 승자가 SF2 만남
+            else {
                 s.sf1.t2 = s.qf1.w || 'TBD';
                 s.sf2.t1 = s.qf2.w || 'TBD';
                 s.sf2.t2 = s.qf3.w || 'TBD';
@@ -281,10 +307,51 @@
             refreshAll();
         }
 
+        // 시각적 대진표 렌더링 (축구 대진표의 위아래 꼬임 방지 처리)
         function renderBrackets() {
             sports.forEach(sport => {
-                const s = state[sport], getW = (t, m) => (t && t !== 'TBD' && m.w === t) ? 'winner' : '';
-                document.getElementById(`bracket-${sport}`).innerHTML = `<div class="round"><h3>예선</h3><div class="match bye-match"><div class="team">부전승</div><div class="team">${s.bye}</div></div><div class="match"><div class="team ${getW(s.qf1.t1, s.qf1)}">${s.qf1.t1}</div><div class="team ${getW(s.qf1.t2, s.qf1)}">${s.qf1.t2}</div></div><div class="match"><div class="team ${getW(s.qf2.t1, s.qf2)}">${s.qf2.t1}</div><div class="team ${getW(s.qf2.t2, s.qf2)}">${s.qf2.t2}</div></div><div class="match"><div class="team ${getW(s.qf3.t1, s.qf3)}">${s.qf3.t1}</div><div class="team ${getW(s.qf3.t2, s.qf3)}">${s.qf3.t2}</div></div></div><div class="round"><h3>4강</h3><div class="match"><div class="team ${getW(s.sf1.t1, s.sf1)}">${s.sf1.t1}</div><div class="team ${getW(s.sf1.t2, s.sf1)}">${s.sf1.t2}</div></div><div class="match" style="margin-top:80px;"><div class="team ${getW(s.sf2.t1, s.sf2)}">${s.sf2.t1}</div><div class="team ${getW(s.sf2.t2, s.sf2)}">${s.sf2.t2}</div></div></div><div class="round"><h3>결승</h3><div class="match" style="margin-top:30px;"><div class="team ${getW(s.f.t1, s.f)}">${s.f.t1}</div><div class="team ${getW(s.f.t2, s.f)}">${s.f.t2}</div></div></div><div class="round"><h3>우승🏆</h3><div class="match champ-match"><div class="team">${s.f.w || 'TBD'}</div></div></div>`;
+                const s = state[sport];
+                const getW = (t, m) => (t && t !== 'TBD' && m.w === t) ? 'winner' : '';
+                
+                let qfHTML = '';
+                
+                if (sport === 'football') {
+                    // 축구는 3타임 경기(qf3)가 위쪽 SF1으로 올라가므로 시각적으로 부전승 밑에 배치
+                    qfHTML = `
+                        <div class="match bye-match"><div class="team">부전승</div><div class="team">${s.bye}</div></div>
+                        <div class="match"><div class="team ${getW(s.qf3.t1, s.qf3)}">${s.qf3.t1}</div><div class="team ${getW(s.qf3.t2, s.qf3)}">${s.qf3.t2}</div></div>
+                        <div class="match" style="margin-top: 40px;"><div class="team ${getW(s.qf1.t1, s.qf1)}">${s.qf1.t1}</div><div class="team ${getW(s.qf1.t2, s.qf1)}">${s.qf1.t2}</div></div>
+                        <div class="match"><div class="team ${getW(s.qf2.t1, s.qf2)}">${s.qf2.t1}</div><div class="team ${getW(s.qf2.t2, s.qf2)}">${s.qf2.t2}</div></div>
+                    `;
+                } else {
+                    // 피구 & 줄다리기는 순서대로 배치
+                    qfHTML = `
+                        <div class="match bye-match"><div class="team">부전승</div><div class="team">${s.bye}</div></div>
+                        <div class="match"><div class="team ${getW(s.qf1.t1, s.qf1)}">${s.qf1.t1}</div><div class="team ${getW(s.qf1.t2, s.qf1)}">${s.qf1.t2}</div></div>
+                        <div class="match" style="margin-top: 40px;"><div class="team ${getW(s.qf2.t1, s.qf2)}">${s.qf2.t1}</div><div class="team ${getW(s.qf2.t2, s.qf2)}">${s.qf2.t2}</div></div>
+                        <div class="match"><div class="team ${getW(s.qf3.t1, s.qf3)}">${s.qf3.t1}</div><div class="team ${getW(s.qf3.t2, s.qf3)}">${s.qf3.t2}</div></div>
+                    `;
+                }
+
+                document.getElementById(`bracket-${sport}`).innerHTML = `
+                    <div class="round">
+                        <h3>예선</h3>
+                        ${qfHTML}
+                    </div>
+                    <div class="round">
+                        <h3>4강</h3>
+                        <div class="match" style="margin-top: 25px;"><div class="team ${getW(s.sf1.t1, s.sf1)}">${s.sf1.t1}</div><div class="team ${getW(s.sf1.t2, s.sf1)}">${s.sf1.t2}</div></div>
+                        <div class="match" style="margin-top: 100px;"><div class="team ${getW(s.sf2.t1, s.sf2)}">${s.sf2.t1}</div><div class="team ${getW(s.sf2.t2, s.sf2)}">${s.sf2.t2}</div></div>
+                    </div>
+                    <div class="round">
+                        <h3>결승</h3>
+                        <div class="match" style="margin-top: 80px;"><div class="team ${getW(s.f.t1, s.f)}">${s.f.t1}</div><div class="team ${getW(s.f.t2, s.f)}">${s.f.t2}</div></div>
+                    </div>
+                    <div class="round">
+                        <h3>우승🏆</h3>
+                        <div class="match champ-match" style="margin-top: 50px;"><div class="team">${s.f.w || 'TBD'}</div></div>
+                    </div>
+                `;
             });
         }
 
